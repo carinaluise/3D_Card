@@ -8,13 +8,21 @@ on:
 jobs:
   add-to-project:
     name: Add issue to project
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
-      - uses: actions/add-to-project@v0.3.0
+      - name: get app auth token
+        id: generate_token
+        uses: tibdex/github-app-token@27fa2b2278ab0663a3e977ebeba15cfe5a490528 # v1.1.1
+        with:
+          app_id: ${{ secrets.TOKEN_GEN_APP_ID }}
+          private_key: ${{ secrets.TOKEN_GEN_PRIVATE_KEY }}
+      - name: add issuue to projext
+        uses: actions/add-to-project@v0.3.0
         with:
           # You can target a repository in a different organization
           # to the issue
           project-url: https://github.com/users/carinaluise/projects/1
-          github-token: ${{ secrets.github-token }}
-          labeled: bug, needs-triage
-          label-operator: OR
+          github-token: ${{ steps.generate_token.outputs.token  }}
+#           labeled: bug, needs-triage
+#           label-operator: OR
