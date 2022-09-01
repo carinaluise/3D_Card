@@ -1,28 +1,62 @@
-name: Add To GitHub projects
+# name: Add To GitHub projects
+
+# on:
+#   issues:
+#     types:
+#       - opened
+
+# jobs:
+#   add-to-project:
+#     name: Add issue to project
+#     runs-on: ubuntu-latest
+#     continue-on-error: true
+#     steps:
+#       - name: get app auth token
+#         id: generate_token
+#         uses: tibdex/github-app-token@27fa2b2278ab0663a3e977ebeba15cfe5a490528 # v1.1.1
+#         with:
+#           app_id: ${{ secrets.TOKEN_GEN_APP_ID }}
+#           private_key: ${{ secrets.TOKEN_GEN_PRIVATE_KEY }}
+#       - name: add issuue to projext
+#         uses: actions/add-to-project@v0.3.0
+#         with:
+#           # You can target a repository in a different organization
+#           # to the issue
+#           project-url: https://github.com/users/carinaluise/projects/1
+#           github-token: ${{ steps.generate_token.outputs.token  }}
+#           labeled: bug, needs-triage
+#           label-operator: OR
+
+
+name: GitHub Issue Sync
 
 on:
   issues:
+    # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issues
     types:
       - opened
+      - reopened
+      - labeled
 
 jobs:
-  add-to-project:
-    name: Add issue to project
+  sync:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
-      - name: get app auth token
-        id: generate_token
-        uses: tibdex/github-app-token@27fa2b2278ab0663a3e977ebeba15cfe5a490528 # v1.1.1
+      - name: github-issue-sync
+        uses: paritytech/github-issue-sync@2
         with:
-          app_id: ${{ secrets.TOKEN_GEN_APP_ID }}
-          private_key: ${{ secrets.TOKEN_GEN_PRIVATE_KEY }}
-      - name: add issuue to projext
-        uses: actions/add-to-project@v0.3.0
-        with:
-          # You can target a repository in a different organization
-          # to the issue
-          project-url: https://github.com/users/carinaluise/projects/1
-          github-token: ${{ steps.generate_token.outputs.token  }}
-#           labeled: bug, needs-triage
-#           label-operator: OR
+          # The token needs to have the following permissions
+          # - "read:org" is used to read the project's board
+          # - "write:org" is used to assign issues to the project's board
+          # - "repo" is used to access issues through the API
+          token: ${{ secrets.PROJECTS_TOKEN }}
+
+          # The number of the project which the issues will be synced to
+          project: 1
+
+          # The name of the project field which the issue will be assigned to
+#           target-project-field: Team
+
+          # The value which will be set in the field, in this case the team's
+          # name
+#           target-project-field-value: Foo
