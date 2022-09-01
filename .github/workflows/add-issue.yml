@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: github-issue-sync
-        uses: paritytech/github-issue-sync@1
+        uses: paritytech/github-issue-sync@0.2
         with:
           # The token needs to have the following permissions
           # - "read:org" is used to read the project's board
